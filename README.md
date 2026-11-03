@@ -1,46 +1,43 @@
-# Mystery Island — Learn2Earn Python Project
+# Mystery Island
 
-A text-based adventure game built in Python for the Learn2Earn Easy Challenge. The player is stranded on a mysterious island and must collect materials to build a raft and escape.
+Mystery Island is a text-based adventure game built with standard Python. Stranded on a mysterious island, the player must explore five locations, collect the rope and lantern, and reach the Lighthouse to light its beacon and signal for rescue.
 
-## How to Play
+## How to Run
 
-1. Ensure you have Python 3 installed.
-2. Clone this repository.
-3. Run the game from your terminal:
-   ```bash
-   python main.py
-Game Rules
-Goal: Collect wood, rope, sail, and a torch to survive the cave and build your raft.
-
-Commands: Type commands into the terminal and press Enter.
-
-search — Look around the current scene for items.
-
-go [scene] — Move to a new location (e.g., go jungle, go beach, go cave).
-
-inventory — Check what items you are currently carrying.
-
-build — Attempt to build the raft (requires wood, rope, and sail).
-
-quit — Exit the game.
-
-Lose Conditions: Entering the cave without a torch, or typing 3 invalid commands.
-
-Project Structure
-This project uses a modular file structure to separate concerns and keep the codebase readable:
-
-main.py — The entry point containing the main game loop.
-
-player.py — Manages the player's state, inventory, and variables.
-
-locations.py — Contains the scene descriptions and search logic.
-
-commands.py — Handles the logic for processing user inputs and player movement.
-
-text
-
-### Step 2: Commit and Push
-Once you have pasted that and saved the file, go to your terminal and run:
+Requires Python 3.
 
 ```bash
-git add README.md
+python3 main.py
+```
+
+## Game Rules
+
+- **Goal:** Collect the **rope** from the Jungle and the **lantern** from the Cave, travel to the Lighthouse, and type `light beacon` to win.
+- **Energy:** You start with **5 Energy**. Moving to a new location costs **1 Energy**. If your Energy reaches **0**, the game ends in a Game Over.
+- **Taking items:** Use `take [item]` to pick up an item available in the current room, such as `take rope` or `take lantern`.
+- **Locations:** Beach (starting location), Jungle, Cave, Old Bridge, and Lighthouse.
+- **Available actions:** Each room displays the actions you can take there, such as `[Jungle] Actions: quit, go beach, go cave, take rope`.
+- **Quitting:** Type `quit` to end the current game.
+- **Play again:** After a win, game over, or quit, type `yes` when prompted to start a new game.
+
+### Winning Route
+
+```text
+go jungle
+take rope
+go cave
+take lantern
+go old bridge
+go lighthouse
+light beacon
+```
+
+## Project Structure
+
+- `main.py` — Entry point and game controller. Handles the player name prompt, main game loop, energy costs, win/game-over results, and the play-again loop.
+- `player.py` — Defines the `Player` class, including name, current location, inventory, and starting Energy.
+- `locations.py` — Defines the five rooms, their connections, available items, room-specific actions, and status display.
+- `commands.py` — Parses and processes player commands such as `go`, `take`, `inventory`, `light beacon`, and `quit`.
+- `DESIGN.txt` — Project design document covering the game goal, modular architecture, state variables, and game loop.
+
+The code is intentionally modular: game flow lives in `main.py`, player state in `player.py`, world data and presentation in `locations.py`, and input handling in `commands.py`.
