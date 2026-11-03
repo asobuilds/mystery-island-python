@@ -1,40 +1,50 @@
-from locations import show_status, search_scene
-from commands import go, build_raft, parse_go
-from player import inventory, invalid_commands, has_torch, items, cave_searched, current_scene
+from commands import process_command
+from locations import create_rooms, show_status
+from player import Player
 
-print("Mystery Island — loading...")
-print("Welcome to Mystery Island!")
-print("You are stranded on a mysterious island.")
-print("Collect wood, rope, and sail to build a raft and escape!")
 
-while True:
-    show_status(current_scene, inventory)
-    command = input("> ").lower().strip()
+def play_game(name):
+    player = Player(name)
+    rooms = create_rooms()
 
-    if command == "quit":
-        print("Thanks for playing!")
-        break
-    elif command == "search":
-        items, inventory, cave_searched = search_scene(current_scene, inventory, items, cave_searched, has_torch)
-    elif command == "go" or command.startswith("go "):
-        destination = parse_go(command)
-        if destination is None:
-            invalid_commands += 1
-            if invalid_commands >= 3:
-                print("You've used too many invalid commands. Game over!")
-                break
-            continue
-        current_scene, has_torch, game_over = go(destination, current_scene, inventory, has_torch)
-        if game_over:
+    print(f"\nWelcome to Mystery Island, {name}!")
+    print("Find the rope in the Jungle and the lantern in the Cave.")
+    print("Reach the Lighthouse and light the beacon to escape.")
+    print(f"Each move costs 1 energy. You start with {player.energy} energy.")
+
+    while True:
+        show_status(player, rooms)
+        command = input("> ").strip().lower()
+        result = process_command(command, player, rooms)
+
+        if result == "quit":
+            print("Thanks for playing!")
+            return
+
+        if result == "win":
+            print(f"Congratulations, {player.name}! You escaped Mystery Island!")
+            return
+
+        if result == "moved":
+            player.energy -= 1
+            if player.energy <= 0:
+                player.energy = 0
+                print("You are out of energy... Game over!")
+                return
+            print(f"You have {player.energy} energy left.")
+
+
+def main():
+    print("Mystery Island — loading...")
+    name = input("What is your name? ").strip() or "Explorer"
+
+    while True:
+        play_game(name)
+        answer = input("Play again? (yes/no): ").strip().lower()
+        if answer not in ("yes", "y"):
+            print("Thanks for playing!")
             break
-    elif command == "inventory":
-        print("Your inventory: " + (", ".join(inventory) if inventory else "empty"))
-    elif command == "build":
-        if build_raft(items):
-            break
-    else:
-        invalid_commands += 1
-        print("Unknown command. Try: search, go [scene], inventory, build, quit")
-        if invalid_commands >= 3:
-            print("You've used too many invalid commands. Game over!")
-            break
+
+
+if __name__ == "__main__":
+    main()

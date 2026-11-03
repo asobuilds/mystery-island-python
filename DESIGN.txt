@@ -1,0 +1,124 @@
+MYSTERY ISLAND
+Project Design Document
+=======================
+
+1. GAME GOAL
+------------
+Mystery Island is a text-based adventure game. The player is stranded on an
+island and must escape by reaching the Lighthouse and lighting its beacon.
+
+To light the beacon, the player must collect two items:
+  - Rope, found in the Jungle
+  - Lantern, found in the Cave
+
+The player then travels to the Lighthouse and enters "light beacon". If both
+items are in the inventory, the beacon is lit, a rescue ship is signaled, and
+the player wins.
+
+The player starts on the Beach with 5 Energy. Moving to a new location costs
+1 Energy. If Energy reaches 0, the game ends in a Game Over. The player can
+quit at any time, and after any win, game over, or quit, the game asks
+"Play again? (yes/no)".
+
+
+2. FILE STRUCTURE AND MODULARITY
+--------------------------------
+The game is split into four Python files, each with a clear responsibility:
+
+  main.py
+    The entry point and game controller. It asks for the player's name,
+    creates a fresh game state, runs the main game loop, applies movement
+    energy costs, detects game over, handles the win result, and manages the
+    play-again loop.
+
+  player.py
+    Defines the Player class and the starting energy constant. It stores all
+    player-specific state: name, current location, inventory, and energy. It
+    also provides small helpers for checking and adding inventory items.
+
+  locations.py
+    Defines the game world. It builds the five locations (Beach, Jungle,
+    Cave, Old Bridge, and Lighthouse), including their descriptions,
+    connections, and available items. It also generates the list of valid
+    actions for the current room and prints the current status.
+
+  commands.py
+    Contains the command-processing logic. It parses player input, validates
+    movement and item pickup, handles inventory display, checks beacon
+    lighting requirements, and returns a result such as "continue", "moved",
+    "win", or "quit".
+
+This separation keeps each file focused on one concern. Game data and room
+display live in locations.py, player state lives in player.py, input handling
+lives in commands.py, and overall flow control lives in main.py. As a result,
+locations can be added or changed without rewriting the game loop, and
+commands can be adjusted without changing how player state is stored. The
+modules can also be tested or reasoned about independently.
+
+
+3. STATE VARIABLES
+------------------
+The Player class in player.py holds the core state:
+
+  name
+    The player's name, entered at the start of the game. It is used in
+    welcome and victory messages.
+
+  current_scene
+    The player's current location. It starts as "beach" and changes only
+    when a valid move is performed. Room data is looked up in locations.py.
+
+  energy
+    The player's remaining Energy, starting at 5 (STARTING_ENERGY). A
+    successful move to another room costs 1 Energy. Reaching 0 Energy
+    triggers Game Over. Item pickup, inventory checks, and lighting the
+    beacon do not consume Energy.
+
+  inventory
+    A list of items the player is carrying. It starts empty and can contain
+    "rope" and "lantern". Items are added only when the player uses the
+    "take" command in the room where the item exists.
+
+The room data in locations.py is also mutable state: each room has an items
+list. When an item is taken, it is removed from that room so it cannot be
+collected again. A fresh set of rooms is created at the start of each game,
+so restarting restores all items, energy, and location.
+
+
+4. GAME LOOP AND COMMAND PARSING
+--------------------------------
+The main loop in main.py follows this cycle:
+
+  1. Display the current room description, Energy, inventory, and the
+     actions available in that room.
+  2. Read a command from the player and normalize it by trimming whitespace
+     and converting it to lowercase.
+  3. Pass the command to commands.process_command().
+  4. React to the returned result:
+       - "quit": print a farewell and end the current game.
+       - "win": print the victory message and end the current game.
+       - "moved": subtract 1 Energy. If Energy is now 0, print a Game Over
+         message and end the game; otherwise report remaining Energy.
+       - "continue": return to the top of the loop.
+
+After a game ends, main.py asks "Play again? (yes/no)". A "yes" or "y"
+starts a new game with a new Player and fresh room data; any other answer
+exits.
+
+Command parsing in commands.py splits the normalized input into words. The
+first word is the verb and the remaining words form the target. Supported
+commands are:
+
+  go <location>   Move to a connected location.
+  take <item>     Pick up an item available in the current room.
+  inventory       Show the player's current inventory.
+  light beacon    Light the Lighthouse beacon if the requirements are met.
+  quit            End the game.
+
+Multi-word targets such as "go old bridge" are handled by joining the words
+after the verb. Missing targets produce helpful messages, such as
+"Go where? Try 'go jungle'." Invalid movement, unavailable items, and beacon
+attempts without the required items also produce clear feedback without
+ending the game. Room-specific actions are generated from the room's
+connections and items, so the player is always shown valid options for the
+current location.
