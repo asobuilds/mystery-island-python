@@ -1,3 +1,11 @@
+def parse_go(command):
+    parts = command.split()
+    if len(parts) < 2:
+        print("Go where? Try 'go jungle', 'go beach', or 'go cave'.")
+        return None
+    return parts[1]
+
+
 def go(destination, current_scene, inventory, has_torch):
     if destination == current_scene:
         print("You are already at the " + destination + "!")

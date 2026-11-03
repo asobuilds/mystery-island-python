@@ -6,6 +6,7 @@ def show_status(current_scene, inventory):
     print(f"Inventory: {inventory if inventory else 'empty'}")
     print("Available commands: search, go [scene], inventory, build, quit")
     print("Scenes you can go to: beach, jungle, cave")
+    print("Note: you need a torch to survive the dark cave!")
 
 
 def search_scene(current_scene, inventory, items, cave_searched, has_torch):
@@ -18,16 +19,15 @@ def search_scene(current_scene, inventory, items, cave_searched, has_torch):
             inventory.append(found)
             print("You found a " + found + "!")
     elif current_scene == "jungle":
-        options = ["rope", "torch"]
-        found = None
-        for option in options:
+        found_any = False
+        for option in ["rope", "torch"]:
             if not (option in items and items[option]):
-                found = option
-                break
-        if found:
-            items[found] = True
-            inventory.append(found)
-            print("You found a " + found + "!")
+                items[option] = True
+                inventory.append(option)
+                print("You found a " + option + "!")
+                found_any = True
+        if found_any:
+            print("The torch will light your way through the dark cave!")
         else:
             print("You already collected everything available in the jungle!")
     elif current_scene == "cave":

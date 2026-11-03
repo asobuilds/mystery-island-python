@@ -1,5 +1,5 @@
 from locations import show_status, search_scene
-from commands import go, build_raft
+from commands import go, build_raft, parse_go
 from player import inventory, invalid_commands, has_torch, items, cave_searched, current_scene
 
 print("Mystery Island — loading...")
@@ -16,8 +16,14 @@ while True:
         break
     elif command == "search":
         items, inventory, cave_searched = search_scene(current_scene, inventory, items, cave_searched, has_torch)
-    elif command.startswith("go "):
-        destination = command[3:].strip()
+    elif command == "go" or command.startswith("go "):
+        destination = parse_go(command)
+        if destination is None:
+            invalid_commands += 1
+            if invalid_commands >= 3:
+                print("You've used too many invalid commands. Game over!")
+                break
+            continue
         current_scene, has_torch, game_over = go(destination, current_scene, inventory, has_torch)
         if game_over:
             break
