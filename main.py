@@ -19,18 +19,18 @@ def play_game(name):
 
         if result == "quit":
             print("Thanks for playing!")
-            return
+            return "quit"
 
         if result == "win":
             print(f"Congratulations, {player.name}! You escaped Mystery Island!")
-            return
+            return "win"
 
         if result == "moved":
             player.energy -= 1
             if player.energy <= 0:
                 player.energy = 0
                 print("You are out of energy... Game over!")
-                return
+                return "game_over"
             print(f"You have {player.energy} energy left.")
 
 
@@ -39,10 +39,15 @@ def main():
     name = input("What is your name? ").strip() or "Explorer"
 
     while True:
-        play_game(name)
-        answer = input("Play again? (yes/no): ").strip().lower()
-        if answer not in ("yes", "y"):
-            print("Thanks for playing!")
+        outcome = play_game(name)
+        if outcome == "quit":
+            break
+        elif outcome in ("win", "game_over"):
+            answer = input("Play again? (yes/no): ").strip().lower()
+            if answer not in ("yes", "y"):
+                print("Thanks for playing!")
+                break
+        else:
             break
 
 

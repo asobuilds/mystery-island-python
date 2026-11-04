@@ -1,4 +1,4 @@
-STARTING_ENERGY = 5
+STARTING_ENERGY = 7
 
 
 class Player:

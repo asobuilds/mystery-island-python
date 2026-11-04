@@ -58,13 +58,19 @@ def _take(item, player, rooms):
     item = item.strip().lower()
     room = rooms[player.current_scene]
 
-    if item not in room["items"]:
+    matched_item = None
+    for room_item in room["items"]:
+        if item == room_item or item == room_item + "s" or room_item == item + "s":
+            matched_item = room_item
+            break
+
+    if not matched_item:
         print(f"There is no {item} here to take.")
         return "continue"
 
-    room["items"].remove(item)
-    player.add_item(item)
-    print(f"You take the {item}.")
+    room["items"].remove(matched_item)
+    player.add_item(matched_item)
+    print(f"You take the {matched_item}.")
     return "continue"
 
 
